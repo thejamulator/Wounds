@@ -143,19 +143,46 @@ struct BattleView: View {
             )
         }
     
+        func firstTapOfAMove(file: Int, rank: Int) {
+            if let man = battle.board.squares[file][rank].man {
+                if man.player == battle.whoseTurn {
+                    generateMoves(man: man, file: file, rank: rank)
+                    moveStart = (file, rank)
+                    rotatablePieceSelected = man.wounded
+                }
+            }
+        }
         
+        func makeAIMove() async {
+            let startTime = Date()
+            DispatchQueue.main.async {
+                self.positionsEvaluated = 0
+            }
+            if let move = await getBestMove(players: battle.players, whoseTurn: battle.whoseTurn, position: battle.board) {
+                battle.board.makeMove(move: move, depth: searchDepth)
+                DispatchQueue.main.async {
+                    self.eraseHilitedSquares()
+                    self.hiliteSquares[move.fromX][move.fromY] = self.battle.whoseTurn
+                    self.hiliteSquares[move.toX][move.toY] = self.battle.whoseTurn
+                    self.battle.whoseTurn = self.battle.nextPlayer()
+                }
+                if let winner = battle.thereIsAWinner() {
+                    await battleEnded(winner: winner)
+                }
+            }
+            else {
+                await battleEnded(winner: self.battle.nextPlayer()) // TODO: not right for more than 2 players
+            }
+            let endTime = Date()
+            DispatchQueue.main.async {
+                self.timeElapsed = String(format: "%.3f", endTime.timeIntervalSince(startTime)) + " seconds elapsed"
+            }        }
         
         func squareTapped(file: Int, rank: Int) {
             if battle.whoseTurn != blueAI {
                 eraseHilitedSquares() // ??? make sure changing start squares only hilites new destinations
                 if moveStart == nil {
-                    if let man = battle.board.squares[file][rank].man {
-                        if man.player == battle.whoseTurn {
-                            generateMoves(man: man, file: file, rank: rank)
-                            moveStart = (file, rank)
-                            rotatablePieceSelected = man.wounded
-                        }
-                    }
+                    firstTapOfAMove(file: file, rank: rank)
                 }
                 else {
                     let matches = moves.filter({ $0.toX == file && $0.toY == rank })
@@ -166,44 +193,16 @@ struct BattleView: View {
                         battle.whoseTurn = battle.nextPlayer()
                         if battle.whoseTurn.playerType == .AI {
                             Task {
-                                let startTime = Date()
-                                DispatchQueue.main.async {
-                                    self.positionsEvaluated = 0
-                                }
-                                if let move = await getBestMove(players: battle.players, whoseTurn: battle.whoseTurn, position: battle.board) {
-                                    battle.board.makeMove(move: move, depth: searchDepth)
-                                    DispatchQueue.main.async {
-                                        self.eraseHilitedSquares()
-                                        self.hiliteSquares[move.fromX][move.fromY] = self.battle.whoseTurn
-                                        self.hiliteSquares[move.toX][move.toY] = self.battle.whoseTurn
-                                        self.battle.whoseTurn = self.battle.nextPlayer()
-                                    }
-                                    if let winner = battle.thereIsAWinner() {
-                                        await battleEnded(winner: winner)
-                                    }
-                                }
-                                else {
-                                    await battleEnded(winner: self.battle.nextPlayer()) // TODO: not right for more than 2 players
-                                }
-                                let endTime = Date()
-                                DispatchQueue.main.async {
-                                    self.timeElapsed = String(format: "%.3f", endTime.timeIntervalSince(startTime)) + " seconds elapsed"
-                                }
+                                await makeAIMove()
                             }
                         }
                         else {
                             eraseHilitedSquares()
                         }
                     }
-                    else { // tapped a square we can't move to
-                        eraseHilitedSquares()
-                        if let man = battle.board.squares[file][rank].man {
-                            if man.player == battle.whoseTurn {
-                                moveStart = (file, rank)
-                                generateMoves(man: man, file: file, rank: rank)
-                                rotatablePieceSelected = man.wounded
-                            }
-                        }
+                    else {
+                        // tapped a square we can't move to, so we're starting to move a new piece
+                        firstTapOfAMove(file: file, rank: rank)
                     }
                     moveStart = nil
                     moves.removeAll()
@@ -299,6 +298,11 @@ struct BattleView: View {
                     eraseHilitedSquares()
                     moveStart = nil
                     moves.removeAll()
+                    rotatablePieceSelected = false
+                    battle.whoseTurn = battle.nextPlayer()
+                    Task {
+                        await makeAIMove()
+                    }
                 }
             }
         }
@@ -309,6 +313,11 @@ struct BattleView: View {
                     eraseHilitedSquares()
                     moveStart = nil
                     moves.removeAll()
+                    rotatablePieceSelected = false
+                    battle.whoseTurn = battle.nextPlayer()
+                    Task {
+                        await makeAIMove()
+                    }
                 }
             }
         }
