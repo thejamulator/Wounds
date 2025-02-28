@@ -9,6 +9,7 @@ struct WoundsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+//            ContentView(battleViewModel: BattleView.ViewModel(battle: Battle.getLastWoundTest()))
         }
     }
 }
