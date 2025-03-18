@@ -270,6 +270,35 @@ class Battle
         return Battle(board: board)
     }
     
+    static func getBootCampLevel7() -> Battle {
+        let board = Board(squaresWide: 6, squaresHigh: 6)
+        board.putMan(man: Man(piece: Piece.rook(), player: blue), x: 0, y: 0)
+        board.putMan(man: Man(piece: Piece.knight(), player: blue), x: 1, y: 0)
+        board.putMan(man: Man(piece: Piece.bishop(), player: blue), x: 2, y: 0)
+        board.putMan(man: Man(piece: Piece.king(), player: blue), x: 3, y: 0)
+        board.putMan(man: Man(piece: Piece.knight(), player: blue), x: 4, y: 0)
+        board.putMan(man: Man(piece: Piece.rook(), player: blue), x: 5, y: 0)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 0, y: 1)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 1, y: 1)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 2, y: 1)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 3, y: 1)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 4, y: 1)
+        board.putMan(man: Man(piece: Piece.star(), player: blue), x: 5, y: 1)
+        board.putMan(man: Man(piece: Piece.rook(), player: red), x: 0, y: 5)
+        board.putMan(man: Man(piece: Piece.knight(), player: red), x: 1, y: 5)
+        board.putMan(man: Man(piece: Piece.bishop(), player: red), x: 2, y: 5)
+        board.putMan(man: Man(piece: Piece.king(), player: red), x: 3, y: 5)
+        board.putMan(man: Man(piece: Piece.knight(), player: red), x: 4, y: 5)
+        board.putMan(man: Man(piece: Piece.rook(), player: red), x: 5, y: 5)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 0, y: 4)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 1, y: 4)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 2, y: 4)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 3, y: 4)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 4, y: 4)
+        board.putMan(man: Man(piece: Piece.star(), player: red), x: 5, y: 4)
+        return Battle(board: board)
+    }
+    
     static func getAnnihiliation() -> Battle {
         let board = Board(squaresWide: 8, squaresHigh: 8)
         board.putMan(man: Man(piece: Piece.rook(), player: red), x: 0, y: 7)

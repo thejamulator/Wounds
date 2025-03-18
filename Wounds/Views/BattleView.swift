@@ -11,22 +11,31 @@ struct BattleView: View {
         @Published var appState: AppState
         @Published var battle: Battle
         var moves = [Move]()
+        private var makeAIMoveTask: Task<Void, Never>?
         @Published var hiliteSquares = [[Player?]]()
         @Published var timeElapsed = ""
         @Published var leavesEvaluated = ""
         @Published var branchesPruned = ""
-        @Published var battleOver: Player?
+        @Published var battleOver: Player? {
+            didSet {
+                if battleOver == red {
+                    showRedWonAlert = true
+                }
+                else if battleOver == blue {
+                    showBlueWonAlert = true
+                }
+            }
+        }
         var moveStart: (Int, Int)?
         var positionsEvaluated = 0
-        var prunes = 0
+        @Published var aiIsMoving = false
         @Published var gameType: GameType = .bootCamp {
             didSet {
-                print("gameType \(gameType)")
                 appState.setGameFromGameType(gameType: gameType)
             }
         }
+        
         var searchDepth = 2
-//        @Published var evaluationSelections = Set<UUID>()
         @Published var rotatablePieceSelected = false
         @Published var redraw = false
         var gravX = 0 // dummy values
@@ -36,7 +45,18 @@ struct BattleView: View {
         @Published var showGamesInfo: Bool = false
         @Published var showAITypeInfo: Bool = false
         @Published var showEvaluationHeuristicsInfo: Bool = false
+        @Published var showRedWonAlert: Bool = false
+        @Published var showBlueWonAlert: Bool = false
 
+        func getAlertMessageForGameOver() -> String {
+            if let winner = battleOver {
+                return winner.name
+            }
+            else {
+                return ""
+            }
+        }
+        
         @Published var material = true {
             didSet {
                 appState.game.evaluateMaterial = material
@@ -65,27 +85,24 @@ struct BattleView: View {
             self.appState = appState
             self.battle = appState.game.level().battle
             hiliteSquares = Array(repeating: Array(repeating: nil, count: battle.board.squaresHigh), count: battle.board.squaresWide)
-//            evaluationSelections.insert(appState.game.evaluationMethods[0].id)
             if battle.board.showHilightsAtStart {
                 moveStart = (battle.board.fromX!, battle.board.fromY!)
                 hiliteSquares[battle.board.toX!][battle.board.toY!] = battle.board.player
             }
         }
+                
+        func newGame() {
+            makeAIMoveTask?.cancel()
+            aiIsMoving = false
+            battle.whoseTurn = red
+            appState.setGameFromGameType(gameType: appState.gameType)
+            nextLevel(battle: appState.game.level().battle)
+        }
         
-//        func evaluationEnabled(name: String) -> Bool {
-//            var result = false
-//            if let method = appState.game.evaluationMethods.first(where: { $0.name == name }) {
-//                if evaluationSelections.contains(where: { $0 == method.id }) {
-//                    result = true
-//                }
-//            }
-//            return result
-//        }
-        
-        func newGame(battle: Battle) {
+        func nextLevel(battle: Battle) {
+            self.battle = battle
             moveStart = nil
             battleOver = nil
-            self.battle = battle
             hiliteSquares = Array(repeating: Array(repeating: nil, count: battle.board.squaresHigh), count: battle.board.squaresWide)
             DispatchQueue.main.async {
                 self.positionsEvaluated = 0
@@ -139,7 +156,7 @@ struct BattleView: View {
                 winner: winner,
                 computerWon: { battleOver = winner },
                 humanWon: { battleOver = winner },
-                nextLevel: { self.newGame(battle: appState.game.level().battle) }
+                nextLevel: { self.nextLevel(battle: appState.game.level().battle) }
             )
         }
     
@@ -153,30 +170,38 @@ struct BattleView: View {
             }
         }
         
-        func makeAIMove() async {
-            let startTime = Date()
-            DispatchQueue.main.async {
-                self.positionsEvaluated = 0
-            }
-            if let move = await getBestMove(players: battle.players, whoseTurn: battle.whoseTurn, position: battle.board) {
-                battle.board.makeMove(move: move, depth: searchDepth)
+        func makeAIMove() {
+            makeAIMoveTask = Task {
+                let startTime = Date()
                 DispatchQueue.main.async {
-                    self.eraseHilitedSquares()
-                    self.hiliteSquares[move.fromX][move.fromY] = self.battle.whoseTurn
-                    self.hiliteSquares[move.toX][move.toY] = self.battle.whoseTurn
-                    self.battle.whoseTurn = self.battle.nextPlayer()
+                    self.positionsEvaluated = 0
+                    self.aiIsMoving = true
                 }
-                if let winner = battle.thereIsAWinner() {
-                    await battleEnded(winner: winner)
+                if let move = await getBestMove(players: battle.players, whoseTurn: battle.whoseTurn, position: battle.board) {
+                    if Task.isCancelled { return }
+                    battle.board.makeMove(move: move, depth: searchDepth)
+                    DispatchQueue.main.async {
+                        self.eraseHilitedSquares()
+                        self.hiliteSquares[move.fromX][move.fromY] = self.battle.whoseTurn
+                        self.hiliteSquares[move.toX][move.toY] = self.battle.whoseTurn
+                        self.battle.whoseTurn = self.battle.nextPlayer()
+                    }
+                    if let winner = battle.thereIsAWinner() {
+                        if Task.isCancelled { return }
+                        await battleEnded(winner: winner)
+                    }
+                }
+                else {
+                    if Task.isCancelled { return }
+                    await battleEnded(winner: self.battle.nextPlayer()) // TODO: not right for more than 2 players
+                }
+                let endTime = Date()
+                DispatchQueue.main.async {
+                    self.timeElapsed = String(format: "%.3f", endTime.timeIntervalSince(startTime)) + " seconds elapsed"
+                    self.aiIsMoving = false
                 }
             }
-            else {
-                await battleEnded(winner: self.battle.nextPlayer()) // TODO: not right for more than 2 players
-            }
-            let endTime = Date()
-            DispatchQueue.main.async {
-                self.timeElapsed = String(format: "%.3f", endTime.timeIntervalSince(startTime)) + " seconds elapsed"
-            }        }
+        }
         
         func squareTapped(file: Int, rank: Int) {
             if battle.whoseTurn != blueAI {
@@ -192,9 +217,7 @@ struct BattleView: View {
                         rotatablePieceSelected = false
                         battle.whoseTurn = battle.nextPlayer()
                         if battle.whoseTurn.playerType == .AI {
-                            Task {
-                                await makeAIMove()
-                            }
+                            makeAIMove()
                         }
                         else {
                             eraseHilitedSquares()
@@ -300,9 +323,7 @@ struct BattleView: View {
                     moves.removeAll()
                     rotatablePieceSelected = false
                     battle.whoseTurn = battle.nextPlayer()
-                    Task {
-                        await makeAIMove()
-                    }
+                    makeAIMove()
                 }
             }
         }
@@ -315,9 +336,7 @@ struct BattleView: View {
                     moves.removeAll()
                     rotatablePieceSelected = false
                     battle.whoseTurn = battle.nextPlayer()
-                    Task {
-                        await makeAIMove()
-                    }
+                    makeAIMove()
                 }
             }
         }
@@ -329,6 +348,9 @@ struct BattleView: View {
                 action: {viewModel.showHowToPlay = true},
                 label: {
                     HStack {
+                        if viewModel.aiIsMoving {
+                            PulseBrain()
+                        }
                         Text("How to Play")
                         Image(systemName: "questionmark.circle")
                     }
@@ -348,18 +370,29 @@ struct BattleView: View {
         .overlay(gamesInfoOverlay)
         .overlay(aiTypeInfoOverlay)
         .overlay(evaluationHeuristicsInfoOverlay)
+        .alert("Red Won", isPresented: $viewModel.showRedWonAlert) {
+            Button("OK", action: { viewModel.showRedWonAlert = false })
+        } message: {
+            Text("Congratulations!")
+        }
+        .alert("Blue Won", isPresented: $viewModel.showBlueWonAlert) {
+//            Button("Replay", action: { viewModel.showBlueWonAlert = false })
+            Button("OK", action: { viewModel.showBlueWonAlert = false })
+        } message: {
+            Text("Better Luck Next Time!")
+        }
     }
     
     @ViewBuilder
     func bottomView() -> some View {
         VStack {
-            if viewModel.battleOver != nil {
-                HStack {
-                    Spacer()
-                    Text("\(viewModel.battleOver!.name) Won!!!")
-                    Spacer()
-                }
-            }
+//            if viewModel.battleOver != nil {
+//                HStack {
+//                    Spacer()
+//                    Text("\(viewModel.battleOver!.name) Won!!!")
+//                    Spacer()
+//                }
+//            }
             middleButtonsView()
             TabView {
                 gamePickerView()
@@ -444,7 +477,7 @@ struct BattleView: View {
             Button(action: { viewModel.rotateLeft() }, label: { Text("Rotate Left") })
                 .disabled(!viewModel.rotatablePieceSelected)
                 .buttonStyle(BorderedButtonStyle())
-            Button(action: { viewModel.newGame(battle: viewModel.appState.game.level().battle) }, label: { Text("New Game") })
+            Button(action: { viewModel.newGame() }, label: { Text("New Game") })
                 .buttonStyle(BorderedButtonStyle())
             Button(action: { viewModel.rotateRight() }, label: { Text("Rotate Right") })
                 .disabled(!viewModel.rotatablePieceSelected)
@@ -515,155 +548,6 @@ struct BattleView: View {
         .scaleEffect(0.8)
 #endif
     }
-    
-//    @ViewBuilder
-//    func gameControlsView() -> some View {
-//        VStack {
-//            #if os(iOS)
-//                iOSHorizontalListsView()
-//            #else
-//            macOSVerticalListsView()
-//            #endif
-//            if viewModel.appState.game.aiType == .minimax || viewModel.appState.game.aiType == .pruner {
-//                Text("Search Depth")
-//                Picker("", selection: $viewModel.searchDepth) {
-//                    ForEach(0..<5, id: \.self) {
-//                        Text("\($0)")
-//                    }
-//                }.pickerStyle(.segmented)
-//            }
-//            Text(viewModel.timeElapsed)
-//            Text(viewModel.leavesEvaluated)
-//            Spacer()
-//        }
-//    }
-    
-//    @ViewBuilder
-//    func iOSHorizontalListsView() -> some View {
-//        RatioSplitHStack(
-//            leftWidthRatio: 0.5,
-//            leftContent: {
-//                ZStack {
-//                    List {
-//                        Picker("", selection: $viewModel.aIType) {
-//                            ForEach(ViewModel.AIType.allCases, id: \.self) {
-//                                Text($0.rawValue.capitalized)
-//                            }
-//                        }.pickerStyle(.inline)
-//                            .padding(.top, -2)
-//                    }
-//                    VStack {
-//                        HStack {
-//                            Text("AI Type")
-//                                .padding(5)
-//                        }.background(.clear)
-//                        Spacer()
-//                    }
-//                }
-//            },
-//            rightContent: {
-//                iOSEvaluationOrInfoView()
-//            }
-//        )
-//    }
-    
-//    @ViewBuilder
-//    func iOSEvaluationOrInfoView() -> some View {
-//        switch viewModel.aIType {
-//        case .random:
-//            Text("Random has no evaluators")
-//        case .kamikaze:
-//            Text("Kamikaze has no evaluators")
-//        case .minimax:
-//            iOSEvaluationChooserView()
-//        case .pruner:
-//            iOSEvaluationChooserView()
-//        }
-//    }
-    
-//    @ViewBuilder
-//    func iOSEvaluationChooserView() -> some View {
-//        ZStack {
-//            VStack {
-//                Text("Evaluation Types")
-//                    .padding(.top, 5)
-//                    .padding(.bottom, 7)
-//                Toggle("Material", isOn: $viewModel.material)
-//                    .padding(.bottom, 5)
-//                Toggle("Mobility", isOn: $viewModel.mobility)
-//                    .padding(.bottom, 5)
-//                Toggle("Center", isOn: $viewModel.center)
-//                    .padding(.bottom, 5)
-//                Toggle("Enemy", isOn: $viewModel.enemy)
-//                Rectangle()
-//                    .frame(maxWidth: .infinity)
-//                    .foregroundColor(Color(red: 0.95, green: 0.95, blue: 0.95))
-//            }
-//            .padding([.leading, .trailing], 15)
-//            .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-//        }
-//    }
-    
-//    @ViewBuilder
-//    func macOSVerticalListsView() -> some View {
-//        RatioSplitVStack(
-//            topWidthRatio: 0.5,
-//            topContent: {
-//                VStack {
-//                    HStack {
-//                        Text("AI Type")
-//                            .padding(5)
-//                    }
-//                    List {
-//                        Picker("", selection: $viewModel.aIType) {
-//                            ForEach(ViewModel.AIType.allCases, id: \.self) {
-//                                Text($0.rawValue.capitalized)
-//                            }
-//                        }.pickerStyle(.inline)
-//                            .padding(.top, 13)
-//                    }
-//                }
-//            },
-//            bottomContent: {
-//                macOSEvaluationOrInfoView()
-//            }
-//        )
-//    }
-
-//    @ViewBuilder
-//    func macOSEvaluationOrInfoView() -> some View {
-//        switch viewModel.aIType {
-//        case .random:
-//            Text("Random has no evaluators")
-//        case .kamikaze:
-//            Text("Kamikaze has no evaluators")
-//        case .minimax:
-//            macOSEvaluationChooserView()
-//        case .pruner:
-//            macOSEvaluationChooserView()
-//        }
-//    }
-    
-//    @ViewBuilder
-//    func macOSEvaluationChooserView() -> some View {
-//        VStack {
-//            Text("Evaluation Types")
-//                .padding(.top, 5)
-//                .padding(.bottom, 7)
-//            Toggle("Material", isOn: $viewModel.material)
-//                .padding(.bottom, 5)
-//            Toggle("Mobility", isOn: $viewModel.mobility)
-//                .padding(.bottom, 5)
-//            Toggle("Center", isOn: $viewModel.center)
-//                .padding(.bottom, 5)
-//            Toggle("Enemy", isOn: $viewModel.enemy)
-//            Rectangle()
-//                .frame(maxWidth: .infinity)
-//                .foregroundColor(Color(red: 0.95, green: 0.95, blue: 0.95))
-//        }
-//        .padding([.leading, .trailing], 15)
-//        .background(Color(red: 0.95, green: 0.95, blue: 0.95))
-//    }
         
     @ViewBuilder
     func boardView() -> some View {
@@ -695,23 +579,6 @@ struct BattleView: View {
                                         viewModel.squareTapped(file: file, rank: rank)
                                     }
                             }
-//                            .onTapGesture {
-//                                viewModel.squareTapped(file: file, rank: rank)
-//                            }
-//                            ZStack {
-//                                Rectangle()
-//                                    .fill(viewModel.getBackgroundColor(file: file, rank: rank))
-//                                if let man = viewModel.getMan(file: file, rank: rank) {
-//                                    GeometryReader { geometry in
-//                                        let viewModel = ManView.ViewModel(size: geometry.size, man: man)
-//                                        ManView(
-//                                            viewModel: viewModel
-//                                        )
-//                                    }
-//                                }
-//                            }.onTapGesture {
-//                                viewModel.squareTapped(file: file, rank: rank)
-//                            }
                         }
                     }
                 }
