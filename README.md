@@ -17,7 +17,7 @@ Piece are maps of their movement capabilities. They are made up of prongs.
 
 This piece is called a Star. They take the place of pawns in this game.
 
-<img alt="Star" src="Wounds/Images/Star.png">
+<img alt="Star" src="Images/Star.png">
 
 When you tap a piece, its legal moves get highlighted.
 
