@@ -17,7 +17,7 @@ Piece are maps of their movement capabilities. They are made up of prongs.
 
 This piece is called a Star. They take the place of pawns in this game.
 
-<img alt="Star" src="/Images/Star.png">
+<img alt="Star" src="https://thejamulator.github.io/Wounds/Images/Star.png">
 
 When you tap a piece, its legal moves get highlighted.
 
@@ -95,7 +95,7 @@ Now the prong is short instead of long; the bishop can only move one square at a
 
 ### Rotation
 
-Once a piece has been wounded, it is allowed to be rotated, which takes up that players turn the way any other move would. There are Rotate Left and Rotate Right buttons which are enabled when you select a wounded piece.
+Once a piece has been wounded, it is allowed to be rotated, which takes up that player's turn the way any other move would. There are Rotate Left and Rotate Right buttons which are enabled when you select a wounded piece.
 
 ### Winning the Game
 
