@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		17F5175F2D8A331100DBCFFF /* WoundsEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 17F5175E2D8A331100DBCFFF /* WoundsEngine */; };
+		17F5180E2D8B300800DBCFFF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 17F5180D2D8B2FFA00DBCFFF /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,6 +24,7 @@
 /* Begin PBXFileReference section */
 		178DB99D2CF54F2400F0FC47 /* Wounds.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wounds.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		178DB9AE2CF54F2500F0FC47 /* WoundsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoundsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		17F5180D2D8B2FFA00DBCFFF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -85,6 +87,7 @@
 		178DB9942CF54F2400F0FC47 = {
 			isa = PBXGroup;
 			children = (
+				17F5180D2D8B2FFA00DBCFFF /* README.md */,
 				17F518082D8B2F0300DBCFFF /* Images */,
 				178DB99F2CF54F2400F0FC47 /* Wounds */,
 				178DB9B12CF54F2500F0FC47 /* WoundsTests */,
@@ -199,6 +202,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17F5180E2D8B300800DBCFFF /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
