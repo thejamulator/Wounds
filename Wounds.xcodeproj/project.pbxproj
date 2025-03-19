@@ -49,6 +49,11 @@
 			path = WoundsTests;
 			sourceTree = "<group>";
 		};
+		17F518082D8B2F0300DBCFFF /* Images */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Images;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +85,7 @@
 		178DB9942CF54F2400F0FC47 = {
 			isa = PBXGroup;
 			children = (
+				17F518082D8B2F0300DBCFFF /* Images */,
 				178DB99F2CF54F2400F0FC47 /* Wounds */,
 				178DB9B12CF54F2500F0FC47 /* WoundsTests */,
 				17575A492D8A288D00DAE3ED /* Frameworks */,
@@ -113,6 +119,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				178DB99F2CF54F2400F0FC47 /* Wounds */,
+				17F518082D8B2F0300DBCFFF /* Images */,
 			);
 			name = Wounds;
 			packageProductDependencies = (
