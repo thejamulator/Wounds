@@ -24,7 +24,7 @@ extension BattleView {
                                 .font(.system(size: 24))
                                 .fontWeight(.heavy)
                                 .padding(.bottom, 10)
-                            Text("Pieces are a map of their movement capabilities. They are made up of prongs.")
+                            Text("Piece are maps of their movement capabilities. They are made up of prongs.")
                                 .multilineTextAlignment(.center)
                                 .padding(.bottom, 10)
                                 .padding([.leading, .trailing], 20)
