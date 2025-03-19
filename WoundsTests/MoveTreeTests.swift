@@ -4,6 +4,7 @@
 
 import XCTest
 @testable import Wounds
+import WoundsEngine
 
 final class MoveTreeTests: XCTestCase {
 
