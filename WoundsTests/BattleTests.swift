@@ -16,7 +16,7 @@ final class BattleTests: XCTestCase {
     }
 
     func test_blueIsAI() throws {
-        let battle = Battle.getBootCamp()
+        let battle = Battle.getBootCampLevel1()
         XCTAssertTrue(battle.blueIsAI)
     }
 

@@ -27,9 +27,9 @@ final class BoardTests: XCTestCase {
     }
 
     func testBootCampMoves() throws {
-        let boot = Battle.getBootCamp()
+        let boot = Battle.getBootCampLevel1()
         let moves = boot.board.generateMoves(player: red)
-        XCTAssertEqual(moves.count, 26)
+        XCTAssertEqual(moves.count, 28)
     }
     
     func test_centralityFile() throws {
@@ -68,14 +68,14 @@ final class BoardTests: XCTestCase {
     }
     
     func test_gravitationalCenter() throws {
-        let battle = Battle.getBootCamp()
+        let battle = Battle.getBootCampLevel1()
         let (gravX, gravY) = battle.board.gravitationalCenter(player: red)
-        XCTAssertEqual(gravX, 3)
-        XCTAssertEqual(gravY, 6)
+        XCTAssertEqual(gravX, 2)
+        XCTAssertEqual(gravY, 5)
     }
     
     func test_gravitationalDistance() throws {
-        let battle = Battle.getBootCamp()
+        let battle = Battle.getBootCampLevel1()
         XCTAssertEqual(battle.board.gravitationalDistance(gravX: 3, gravY: 6, file: 4, rank: 5), 2)
         XCTAssertEqual(battle.board.gravitationalDistance(gravX: 2, gravY: 7, file: 4, rank: 5), 4)
     }

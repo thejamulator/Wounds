@@ -72,7 +72,7 @@ final class MoveTreeTests: XCTestCase {
 //        
 //    }
     
-    func boardEvaluate(board: Board, whoseTurn: Player, moveCount: Int) -> Int {
+    func boardEvaluate(board: Board, whoseTurn: Player) -> Int {
         var score = 0
         for rank in 0..<board.squaresHigh {
             for file in 0..<board.squaresWide {
@@ -88,7 +88,7 @@ final class MoveTreeTests: XCTestCase {
                 }
             }
         }
-        return score + moveCount
+        return score
     }
     
     func boardGenerateMoves(board: Board, whoseTurn: Player) -> [Move] {

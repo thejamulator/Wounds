@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 /*
  A "doubleton", a singleton without a private init. That way we can instantiate separate instances for unit testing

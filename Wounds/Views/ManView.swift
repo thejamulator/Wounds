@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 struct ManView: View {
     var viewModel: ViewModel
@@ -63,15 +64,6 @@ struct ManView: View {
                 path1.closeSubpath()
             }
         }
-        
-        func printQueen() {
-            if man.piece.name == "Queen" {
-                print("man.abilities.count \(man.abilities.count)")
-                for ability in man.abilities {
-                    print("ability.abilityType \(ability.abilityType) \(ability.xOffset) \(ability.yOffset)")
-                }
-            }
-        }
     }
     
     var body: some View {
@@ -79,7 +71,6 @@ struct ManView: View {
             Circle()
                 .fill(viewModel.manColor)
                 .frame(width: viewModel.girth, height: viewModel.girth)
-//            let _ = viewModel.printQueen()
             ForEach(viewModel.man.abilities) { ability in
                 switch(ability.abilityType)
                 {

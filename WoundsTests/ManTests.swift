@@ -79,10 +79,10 @@ final class ManTests: XCTestCase {
         board.putMan(man: attacker, x: 2, y: 2)
         let defender = Man(piece: Piece.rook(), player: blue)
         board.putMan(man: defender, x: 3, y: 2)
-        let defenderValueBefore = defender.value
+        let defenderValueBefore = defender.calculateValue()
         let attackingAbility = attacker.abilities.first(where: { $0.xOffset == 1 && $0.yOffset == 0 })!
         let move = Move(fromX: 2, fromY: 2, toX: 3, toY: 2, attackingMan: attacker, attackingAbility: attackingAbility)
         XCTAssertEqual(defender.defenseResult(move: move), .AbilityDemoted)
-        XCTAssertNotEqual(defenderValueBefore, defender.value)
+        XCTAssertNotEqual(defenderValueBefore, defender.calculateValue())
     }
 }

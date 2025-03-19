@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 struct SquareView: View {
     let square: Square

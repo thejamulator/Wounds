@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		17F5175F2D8A331100DBCFFF /* WoundsEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 17F5175E2D8A331100DBCFFF /* WoundsEngine */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		178DB9AF2CF54F2500F0FC47 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17F5175F2D8A331100DBCFFF /* WoundsEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,11 +70,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		17575A492D8A288D00DAE3ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		178DB9942CF54F2400F0FC47 = {
 			isa = PBXGroup;
 			children = (
 				178DB99F2CF54F2400F0FC47 /* Wounds */,
 				178DB9B12CF54F2500F0FC47 /* WoundsTests */,
+				17575A492D8A288D00DAE3ED /* Frameworks */,
 				178DB99E2CF54F2400F0FC47 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,6 +116,7 @@
 			);
 			name = Wounds;
 			packageProductDependencies = (
+				17F5175E2D8A331100DBCFFF /* WoundsEngine */,
 			);
 			productName = Wounds;
 			productReference = 178DB99D2CF54F2400F0FC47 /* Wounds.app */;
@@ -159,6 +173,9 @@
 			);
 			mainGroup = 178DB9942CF54F2400F0FC47;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				17F5175D2D8A320800DBCFFF /* XCRemoteSwiftPackageReference "WoundsEngine" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 178DB99E2CF54F2400F0FC47 /* Products */;
 			projectDirPath = "";
@@ -484,6 +501,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		17F5175D2D8A320800DBCFFF /* XCRemoteSwiftPackageReference "WoundsEngine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/thejamulator/WoundsEngine";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		17F5175E2D8A331100DBCFFF /* WoundsEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 17F5175D2D8A320800DBCFFF /* XCRemoteSwiftPackageReference "WoundsEngine" */;
+			productName = WoundsEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 178DB9952CF54F2400F0FC47 /* Project object */;
 }

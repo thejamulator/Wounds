@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 let lightGreen = Color(red: 0.8, green: 1.0, blue: 0.8)
 let darkGreen = Color(red: 0.5, green: 0.7, blue: 0.5)

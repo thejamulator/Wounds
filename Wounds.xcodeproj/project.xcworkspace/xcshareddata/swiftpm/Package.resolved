@@ -1,0 +1,15 @@
+{
+  "originHash" : "1b00a40c0566ae44e76fd003f5a0c6126d23c04185d1dda976a20705fadacd03",
+  "pins" : [
+    {
+      "identity" : "woundsengine",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/thejamulator/WoundsEngine",
+      "state" : {
+        "revision" : "b47d54f00eb2ea5beb9ba91032d53cc386f3468c",
+        "version" : "0.1.4"
+      }
+    }
+  ],
+  "version" : 3
+}

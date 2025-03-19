@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 struct BattleView: View {
     @ObservedObject var viewModel = ViewModel()

@@ -2,6 +2,8 @@
 // Copyright (c) 2024 and Confidential to Eric Ford Consulting All rights reserved.
 //
 
+import WoundsEngine
+
 class MoveTree {
     var players: [Player]
     var ai: Player

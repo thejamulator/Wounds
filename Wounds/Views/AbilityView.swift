@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import WoundsEngine
 
 struct AbilityView: View {
     @ObservedObject var viewModel: ViewModel
