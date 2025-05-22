@@ -1,4 +1,4 @@
-# Wounds
+# Prongs
 ### It's like chess, but no check, checkmate, castling, or pawns.
 
 ## Privacy Policy
